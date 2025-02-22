@@ -6,6 +6,7 @@ from nltk.stem import WordNetLemmatizer
 import numpy as np
 import json
 from gensim.models import Word2Vec
+from keras.layers import Input
 
 class BugReport:
 
@@ -67,6 +68,8 @@ class BugReport:
         else:
             self.processed = np.zeros(BugReport.word2vec_model.vector_size)  # Assuming 100 dimensions for the embeddings
 
+    
+
     def save_processed(self):
         
         # Save the processed data to a file with the issue id, processed data and the duplicate issue id
@@ -77,6 +80,38 @@ class BugReport:
                 'duplicated_issue': self.duplicated_issue
             }, f)
             f.write('\n')
+
+    # Copy of the process method but for a single piece of text
+    @staticmethod
+    def preprocess_text(text):
+        words = text.split()
+
+        # Remove empty strings, stop words, punctuation and numbers
+        words = [word.lower() for word in words if word not in stopwords.words('english') and word not in string.punctuation and not word.isdigit()]
+
+        # Lemmatize the words
+        lemmatizer = WordNetLemmatizer()
+        words = [lemmatizer.lemmatize(word) for word in words] 
+
+        # Initialize vocabulary if not already done
+        if not BugReport.vocab_initialized:
+            BugReport.word2vec_model.build_vocab([words])
+            BugReport.vocab_initialized = True
+        else:
+            # Update the Word2Vec model with the new words
+            BugReport.word2vec_model.build_vocab([words], update=True)
+
+        # Get embeddings for each word and average them
+        word_vectors = [BugReport.word2vec_model.wv[word] for word in words if word in BugReport.word2vec_model.wv]
+        if word_vectors:
+            processed = np.mean(word_vectors, axis=0)
+        else:
+            processed =  np.zeros(BugReport.word2vec_model.vector_size)
+
+        return np.array([processed])
+
+
+        
         
 
 def get_processed_data():
