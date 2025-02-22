@@ -6,7 +6,8 @@ from nltk.stem import WordNetLemmatizer
 import numpy as np
 import json
 from gensim.models import Word2Vec
-from keras.layers import Input
+from keras.layers import Input #type: ignore
+
 
 class BugReport:
 
@@ -125,6 +126,7 @@ def get_processed_data():
     return processed_data
 
 
+# For testing purposes
 # if __name__ == "__main__":
 
 #     # Load the data

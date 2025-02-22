@@ -5,8 +5,8 @@ import random
 import numpy as np
 
 import tensorflow as tf
-from keras.layers import Input, Embedding, Conv1D, GlobalMaxPooling1D, Dense, Concatenate
-from keras.models import Model
+from keras.layers import Input, Dense, Concatenate #type: ignore
+from keras.models import Model #type: ignore
 from sklearn.model_selection import train_test_split
 
 # Read the data from the csv file
