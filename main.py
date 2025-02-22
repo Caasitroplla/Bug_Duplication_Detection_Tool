@@ -103,12 +103,12 @@ def create_pairs(bug_reports):
     random.shuffle(pairs)
     return pairs
 
-# # Read the data
-# df = read_csv_file()
+# Read the data
+df = read_csv_file()
 
-# print(df.head())
-# # Process the data
-# process_data(df)
+print(df.head())
+# Process the data
+process_data(df)
 
 bug_reports = load_processed_data()
 
@@ -125,8 +125,10 @@ y = np.array([pair[2] for pair in pairs])   # Labels
 # Ensure X1 and X2 are 2D arrays
 if X1.ndim == 1:
     X1 = X1.reshape(-1, 1)
+    print("X1 is 1D")
 if X2.ndim == 1:
     X2 = X2.reshape(-1, 1)
+    print("X2 is 1D")
 
 # Split the data into training and testing sets
 X1_train, X1_test, X2_train, X2_test, y_train, y_test = train_test_split(X1, X2, y, test_size=0.2, random_state=42)
@@ -163,5 +165,6 @@ model.save('model.keras')
 
 loss, accuracy = model.evaluate([X1_test, X2_test], y_test)
 
+# Print the loss and accuracy of the model that has been trained
 print(f"Loss: {loss}")
 print(f"Accuracy: {accuracy}")
