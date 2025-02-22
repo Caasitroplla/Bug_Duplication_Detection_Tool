@@ -9,6 +9,9 @@ data/*
 # Also ignore all csv files
 *.csv
 
+# Ignore the processed_data.json file as it gets to big
+processed_data.json
+
 # C extensions
 *.so
 
