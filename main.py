@@ -34,7 +34,7 @@ def process_data(df: pd.DataFrame) -> None:
     if current_issue_id >= highest_issue_id:
         print("All issues already processed")
         return
-    
+
     # Process the data from the highest issue id to the highest issue id in the dataframe
     for issue_id in range(current_issue_id + 1, highest_issue_id + 1):
         # Get the row
@@ -108,27 +108,34 @@ df: pd.DataFrame = read_csv_file()
 
 print(df.head())
 # Process the data
-process_data(df)
+# process_data(df)
 
 bug_reports: list[BugReport] = load_processed_data()
 
 pairs: list[tuple[np.ndarray, np.ndarray, int]] = create_pairs(bug_reports)
 
-# Assuming pairs is a list of tuples: (vector1, vector2, label)
-# Example: pairs = [(vec1, vec2, 1), (vec3, vec4, 0), ...]
+# Convert to numpy arrays with padding if necessary
+max_length = max(max(pair[0].size, pair[1].size) for pair in pairs)
 
-# Prepare the data
-X1: np.ndarray = np.array([pair[0] for pair in pairs])  # First bug report vectors
-X2: np.ndarray = np.array([pair[1] for pair in pairs])  # Second bug report vectors
-y: np.ndarray = np.array([pair[2] for pair in pairs])   # Labels
+# Modify the pad_array function to handle 2D arrays
+def pad_array(arr, target_length):
+    # If array is 2D, flatten it first
+    if arr.ndim == 2:
+        arr = arr.flatten()
+    if arr.size >= target_length:
+        return arr[:target_length]
+    return np.pad(arr, (0, target_length - arr.size), 'constant')
 
-# Ensure X1 and X2 are 2D arrays
+# Convert to numpy arrays and reshape
+X1: np.ndarray = np.array([pad_array(pair[0], max_length) for pair in pairs])
+X2: np.ndarray = np.array([pad_array(pair[1], max_length) for pair in pairs])
+y: np.ndarray = np.array([pair[2] for pair in pairs])
+
+# Reshape X1 and X2 if needed
 if X1.ndim == 1:
-    X1 = X1.reshape(-1, 1)
-    print("X1 is 1D")
+    X1 = X1.reshape(-1, max_length)
 if X2.ndim == 1:
-    X2 = X2.reshape(-1, 1)
-    print("X2 is 1D")
+    X2 = X2.reshape(-1, max_length)
 
 # Split the data into training and testing sets
 X1_train, X1_test, X2_train, X2_test, y_train, y_test = train_test_split(X1, X2, y, test_size=0.2, random_state=42)
